@@ -28,7 +28,7 @@ The Guvi Login System is a dynamic web application designed to manage user authe
 
 ### Installation
 1. Clone the repository to your web server directory.
-2. Import the SQL file into your MySQL database to set up the required tables.
+2. Import the SQL file into your MySQL database to set up the required tables.(in the assets folder)
 3. Configure the database connection settings in the PHP files.
 4. Access the `index.html` file through your web server to interact with the application.
 
