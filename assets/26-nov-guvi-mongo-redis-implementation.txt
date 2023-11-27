@@ -1,0 +1,602 @@
+login.js
+
+
+// Document ready function: Ensures the code runs after the DOM is fully loaded
+$(document).ready(function() {
+// Form submission event handler
+    $("#loginForm").submit(function(event) {
+// Prevents the default form submission action
+        event.preventDefault();
+        $.ajax({
+// AJAX request to server-side PHP script
+            url: 'php/login.php',
+            type: 'post',
+// Serializes form data for AJAX request
+            data: $(this).serialize(),
+// Handles the response from the server
+            success: function(response) {
+                var data = JSON.parse(response);
+                if (data.success && data.token) {
+                    // Store the session token in local storage
+// Stores session token in local storage
+                    localStorage.setItem('sessionToken', data.token);
+                    // Redirect to the profile page
+// Redirects to another page
+                    window.location.href = "profile.html";
+                } else {
+                    // Display the error message
+// Displays an alert message
+                    alert(data.error);
+                }
+            }
+        });
+    });
+});
+
+
+
+profile.js
+
+// Document ready function: Ensures the code runs after the DOM is fully loaded
+$(document).ready(function() {
+    loadUserData(); // Load user data on page load
+
+    $("#editProfileButton").click(function() {
+        // Toggles the edit profile form visibility
+        $("#editProfileForm").toggle();
+    });
+
+    $("#saveProfileButton").click(function() {
+        updateProfile(); // Call to update the profile
+    });
+
+    $("#logoutLink").click(function() {
+        // Clear the session token from local storage and redirect to the index page
+        localStorage.removeItem('sessionToken');
+// Redirects to another page
+        window.location.href = 'index.html';
+    });
+});
+
+// Function to load user data
+function loadUserData() {
+    // Send an AJAX request to get the user's data
+    $.ajax({
+// AJAX request to server-side PHP script
+        url: 'php/profile.php',
+        type: 'GET',
+        headers: { 'Authorization': 'Bearer ' + localStorage.getItem('sessionToken') },
+        dataType: 'json',
+// Handles the response from the server
+        success: function(response) {
+            if (response.error) {
+                console.error("Error:", response.error);
+                // Redirect to login page or show an error
+            } else {
+                // Populate the profile data on the page
+                $("#firstName").text(response.first_name);
+                $("#lastName").text(response.last_name);
+                $("#email").text(response.email);
+                $("#phoneNumber").text(response.phone_number);
+                $("#age").text(response.age);
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error("Error loading user data: " + error);
+            // Handle errors, like redirecting to the login page
+        }
+    });
+}
+
+// Function to update user profile
+function updateProfile() {
+    // Prepare the form data to send in the AJAX request
+    var formData = {
+        firstName: $("#editFirstName").val(),
+        lastName: $("#editLastName").val(),
+        email: $("#editEmail").val(),
+        phone_number: $("#editPhoneNumber").val(),
+        age: $("#editAge").val()
+    };
+
+    // Send an AJAX request to update the user's data
+    $.ajax({
+// AJAX request to server-side PHP script
+        url: 'php/profile.php',
+        type: 'POST',
+        headers: { 'Authorization': 'Bearer ' + localStorage.getItem('sessionToken') },
+        data: formData,
+        dataType: 'json',
+// Handles the response from the server
+        success: function(response) {
+            if (response.error) {
+// Displays an alert message
+                alert("Error updating profile: " + response.error);
+            } else {
+// Displays an alert message
+                alert("Profile updated successfully.");
+                loadUserData(); // Reload the user data to reflect changes
+                $("#editProfileForm").hide(); // Hide the edit form
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error("An error occurred: " + error);
+            // Handle errors, like showing an error message
+        }
+    });
+}
+
+register.js
+// Document ready function: Ensures the code runs after the DOM is fully loaded
+$(document).ready(function() {
+// Form submission event handler
+    $("#registerForm").submit(function(event) {
+// Prevents the default form submission action
+        event.preventDefault();
+        registerUser();
+    });
+});
+
+// Function to handle user registration
+function registerUser() {
+    $.ajax({
+// AJAX request to server-side PHP script
+        url: 'php/register.php',
+        type: 'POST',
+        data: $("#registerForm").serialize(),
+// Handles the response from the server
+        success: function(response) {
+            var data = JSON.parse(response);
+            if (data.success) {
+                $("#registrationStatus").text("Registration successful. Please log in.");
+// Redirects to another page
+                window.location.href = "login.html";
+            } else {
+                $("#registrationStatus").text(data.error);
+            }
+        },
+        error: function(xhr, status, error) {
+            $("#registrationStatus").text("An error occurred during registration: " + error);
+        }
+    });
+}
+
+
+login.php
+
+<?php
+// Configuration for Redis
+$redisHost = '127.0.0.1';
+$redisPort = 6379;
+
+// Configuration for MySQL database connection
+$host = '127.0.0.1';
+$dbname = 'user_management';
+$username = 'root';
+$password = '';
+
+// Connect to MySQL
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    echo json_encode(["error" => "Could not connect to the database $dbname :" . $e->getMessage()]);
+    exit;
+}
+
+// // Connect to Redis
+// $redis = new Redis();
+// $redis->connect($redisHost, $redisPort);
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Check if username and password have been submitted
+    if (empty($_POST["username"]) || empty($_POST["password"])) {
+        echo json_encode(["error" => "Username and password are required."]);
+    } else {
+        // Prepare the statement for execution
+        $stmt = $pdo->prepare("SELECT id, password FROM users WHERE username = :username");
+        $stmt->bindParam(':username', $_POST["username"], PDO::PARAM_STR);
+        $stmt->execute();
+
+        if ($user = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            // Verify the password
+            if (password_verify($_POST["password"], $user['password'])) {
+                // Generate a unique session token
+                $sessionToken = bin2hex(random_bytes(16));
+                // Store the session token in Redis with the user's ID
+                $redis->set('session:' . $sessionToken, $user['id'], 3600); // 3600 seconds = 1 hour expiry
+
+                // Return the session token to the client
+                echo json_encode(["success" => "Login successful", "token" => $sessionToken]);
+            } else {
+                echo json_encode(["error" => "Invalid password."]);
+            }
+        } else {
+            echo json_encode(["error" => "User not found."]);
+        }
+    }
+} else {
+    echo json_encode(["error" => "Invalid request method."]);
+}
+?>
+profile.php
+
+<?php
+
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+
+// Configuration for Redis and MongoDB
+$redisHost = '127.0.0.1';
+$redisPort = 6379;
+$mongoApiUrl = 'mongodb://localhost:27017/';
+
+// Configuration for MySQL database connection
+$host = '127.0.0.1';
+$dbname = 'user_management';
+$username = 'root';
+$password = '';
+
+// Connect to MySQL
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    echo json_encode(["error" => "Could not connect to the database" ]);
+    exit;
+}
+
+// Function to check if the request is an AJAX request
+function isAjaxRequest() {
+    return isset($_SERVER['HTTP_X_REQUESTED_WITH']) &&
+           strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
+}
+
+// Connect to Redis
+// $redis = new Redis();
+// $redis->connect($redisHost, $redisPort);
+
+// Get the token from the client's request
+$token = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+
+// Get user ID from Redis using the token
+$userId = $redis->get('session:' . $token);
+
+if ($userId === false) {
+    echo json_encode(["error" => "User not logged in or session expired"]);
+    exit;
+}
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isAjaxRequest()) {
+    // Assume $_POST data contains the profile data to be updated
+    $profileData = [
+        'firstName' => $_POST['firstName'],
+        'lastName' => $_POST['lastName'], 
+        'email' => $_POST['email'],
+        'phoneNumber' => $_POST['phone_number'],
+        'age' => $_POST['age'],
+        'mysql_id' => $userId // the MySQL user ID
+    ];
+
+    // Call the MongoDB REST API to update the user profile
+    $ch = curl_init($mongoApiUrl . '/' . $userId); // Assuming the URL includes the user's ID at the end
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PUT'); // For update, use PUT
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($profileData));
+
+    $response = curl_exec($ch);
+    if ($response === false) {
+        echo json_encode(["error" => curl_error($ch)]);
+        exit;
+    }
+
+    $decodedResponse = json_decode($response, true);
+    if (isset($decodedResponse['error'])) {
+        echo json_encode(["error" => $decodedResponse['error']]);
+        exit;
+    }
+
+    echo json_encode(["success" => "Profile updated"]);
+    exit;
+}
+
+// If it's a GET request, retrieve the user's profile data
+if ($_SERVER['REQUEST_METHOD'] == 'GET') {
+    // Call the MongoDB REST API to retrieve the user profile
+    $ch = curl_init($mongoApiUrl . '/' . $userId); // Assuming the URL includes the user's ID at the end
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+
+    $response = curl_exec($ch);
+    if ($response === false) {
+        echo json_encode(["error" => curl_error($ch)]);
+        exit;
+    }
+
+    echo $response; // The response should be the user's profile data in JSON format
+    exit;
+}
+
+echo json_encode(["error" => "Invalid request method"]);
+?>
+register.php
+
+<?php
+// Configuration for database connection
+$host = '127.0.0.1';
+$dbname = 'user_management';
+$username = 'root';
+$password = '';
+
+// MongoDB REST API URL (Replace with your actual URL)
+$mongoApiUrl = 'mongodb://localhost:27017/';
+
+// Connecting to the database
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die("Could not connect to the database $dbname :" . $e->getMessage());
+}
+
+// Check if the form was submitted
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Validate input
+    if (empty($_POST["username"]) || empty($_POST["password"]) || empty($_POST["email"]) ||
+        empty($_POST["firstName"]) || empty($_POST["lastName"]) || empty($_POST["phoneNumber"]) ||
+        empty($_POST["age"])) {
+        echo "All fields are required.";
+    } else {
+        // Check if username, email, or phone number already exists
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE username = :username OR email = :email OR phone_number = :phoneNumber");
+        $stmt->bindParam(':username', $_POST["username"], PDO::PARAM_STR);
+        $stmt->bindParam(':email', $_POST["email"], PDO::PARAM_STR);
+        $stmt->bindParam(':phoneNumber', $_POST["phoneNumber"], PDO::PARAM_STR);
+        $stmt->execute();
+        
+        if ($stmt->fetchColumn() > 0) {
+            echo "Username, email, or phone number already taken.";
+        } else {
+            // Prepare SQL statement to prevent SQL injection
+            $stmt = $pdo->prepare("INSERT INTO users (username, password, email, first_name, last_name, phone_number, age) VALUES (:username, :password, :email, :firstName, :lastName, :phoneNumber, :age)");
+
+            // Hash the password
+            $hashedPassword = password_hash($_POST["password"], PASSWORD_DEFAULT);
+
+            // Bind parameters
+            $stmt->bindParam(':username', $_POST["username"], PDO::PARAM_STR);
+            $stmt->bindParam(':password', $hashedPassword, PDO::PARAM_STR);
+            $stmt->bindParam(':email', $_POST["email"], PDO::PARAM_STR);
+            $stmt->bindParam(':firstName', $_POST["firstName"], PDO::PARAM_STR);
+            $stmt->bindParam(':lastName', $_POST["lastName"], PDO::PARAM_STR);
+            $stmt->bindParam(':phoneNumber', $_POST["phoneNumber"], PDO::PARAM_STR);
+            $stmt->bindParam(':age', $_POST["age"], PDO::PARAM_INT);
+
+            // Execute statement
+            try {
+                $stmt->execute();
+
+                // Get the last inserted ID to use in MongoDB document
+                $lastId = $pdo->lastInsertId();
+                
+                // User data for MongoDB
+                $userData = [
+                    'mysql_id' => $lastId,
+                    'username' => $_POST["username"],
+                    // include any other user profile details you want to store in MongoDB
+                ];
+                
+                // Call the MongoDB REST API to store the user profile
+                $ch = curl_init($mongoApiUrl);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+                curl_setopt($ch, CURLOPT_POST, true);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($userData));
+                
+                $response = curl_exec($ch);
+                if ($response === false) {
+                    throw new Exception(curl_error($ch), curl_errno($ch));
+                }
+                
+                $decodedResponse = json_decode($response, true);
+                if (isset($decodedResponse['error'])) {
+                    throw new Exception("MongoDB REST API error: " . $decodedResponse['error']);
+                }
+
+                echo "Registration successful.";
+            } catch (Exception $e) {
+                echo "Error: " . $e->getMessage();
+            }
+        }
+    }
+} else {
+    echo "Please fill out the registration form.";
+}
+?>
+index.html
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome to Our Application</title>
+    <!-- <link href="css/style.css" rel="stylesheet" type="text/css">  -->
+<!-- </head>
+<body> 
+    <h1>Welcome to Our Application</h1>
+    <p>Please choose one of the following options:</p>
+    <div id="navigation">
+        <a href="login.html">Login</a> | <a href="register.html">Register</a> 
+    </div>
+    </body>
+</html> -->
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome to Our Application</title>
+    <!-- Your CSS link -->
+</head>
+<body>
+    <h1>Welcome to Our Application</h1>
+    <p>Please choose one of the following options:</p>
+    <div id="navigation">
+        <a href="login.html">Login</a> | <a href="register.html">Register</a> 
+    </div>
+
+    <div id="registrationMessage" style="display: none;">
+        <p>Registration successful! You can now log in.</p>
+    </div>
+    <!-- Rest of your HTML content -->
+
+    <script>
+        if (window.location.search.indexOf('registered=true') > -1) {
+            document.getElementById('registrationMessage').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
+login.html
+<!DOCTYPE html> 
+<html lang="en">
+<head> 
+    <meta charset="UTF-8">
+    <title>Login</title> 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> 
+</head> 
+<body> 
+    <form id="loginForm">
+        <label for="username">Username:</label> 
+        <input type="text" id="username" name="username" required><br> 
+
+        <label for="password">Password:</label> 
+        <input type="password" id="password" name="password" required><br> 
+
+        <button type="submit">Login</button> 
+    </form> 
+
+    <script> 
+        $(document).ready(function(){ 
+// Form submission event handler
+            $("#loginForm").submit(function(event){
+// Prevents the default form submission action
+                event.preventDefault();
+                $.ajax({
+// AJAX request to server-side PHP script
+                    url: 'php/login.php',
+                    type: 'post',
+// Serializes form data for AJAX request
+                    data: $(this).serialize(),
+// Handles the response from the server
+                    success: function(response){
+                        if (response.indexOf("Login successful") > -1) {
+// Redirects to another page
+                            window.location.href = "profile.html"; // Redirect to profile page 
+                        } else {
+// Displays an alert message
+                            alert(response); // Display other server responses as alerts 
+                        }
+                    }
+                });
+            });
+        });
+    </script> 
+</body> 
+</html>
+
+profile.html
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  
+  <title>User Profile</title>
+  
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+</head>
+
+<body>
+
+  <h1>User Profile</h1>
+
+  <div id="profileContainer">
+
+    <div id="userInfo">
+      <!-- User info loaded by JS -->  
+    </div>
+
+    <div id="userDataContainer">
+      <!-- User data loaded by JS -->
+    </div>
+    
+    <button id="editProfileButton">Edit Profile</button>  
+
+    <div id="editProfileForm" style="display:none;">
+    
+      <input type="text" id="editFirstName" placeholder="First Name">  
+      <input type="text" id="editLastName" placeholder="Last Name">
+    
+      <input type="email" id="editEmail" placeholder="Email">
+    
+      <input type="text" id="editPhoneNumber" placeholder="Phone Number">  
+
+      <input type="number" id="editAge" placeholder="Age">
+      
+      <button id="saveProfileButton">Save Changes</button>
+      
+    </div>
+
+    <a href="#" id="logoutLink">Logout</a>
+
+  </div>
+  
+  <script src="js/profile.js"></script>
+
+</body>
+
+</html>
+
+register.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register</title>
+    <!-- Include your stylesheet if you have one -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+    <form id="registerForm" action="php/register.php" method="post">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required><br>
+
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required><br>
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required><br>
+
+        <label for="firstName">First Name:</label>
+        <input type="text" id="firstName" name="firstName" required><br>
+
+        <label for="lastName">Last Name:</label>
+        <input type="text" id="lastName" name="lastName" required><br>
+
+        <label for="phoneNumber">Phone Number:</label>
+        <input type="text" id="phoneNumber" name="phoneNumber" required><br>
+
+        <label for="age">Age:</label>
+        <input type="number" id="age" name="age" required><br>
+
+        <button type="submit">Register</button>
+        <button><a href=index.html>go back</a></button>
+    </form>
+    <div id="registrationStatus"></div>
+
+    <script src="js/register.js"></script>
+</body>
+</html>
+
