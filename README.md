@@ -43,7 +43,7 @@ Contributions to enhance the Guvi Login System are welcome. Please fork the repo
 This project is licensed under the [MIT License](LICENSE.md).
 
 ## Contact
-For any queries or feedback regarding this project, please reach out to [Your Contact Information].
+For any queries or feedback regarding this project, please reach out to nnivetha373@gmail.com.
 
 ---
 
