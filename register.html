@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register</title>
+    <link href="css/register_style.css" rel="stylesheet" type="text/css">
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-analytics.js";
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+      
+        // Your web app's Firebase configuration
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        const firebaseConfig = {
+          apiKey: "AIzaSyAJzV6Xi0k_L76JpprIBi6O_pEsH101EIM",
+          authDomain: "guviround2.firebaseapp.com",
+          projectId: "guviround2",
+          storageBucket: "guviround2.appspot.com",
+          messagingSenderId: "377242567229",
+          appId: "1:377242567229:web:7f4c108965c85f7c51a054",
+          measurementId: "G-R68KNY77EP"
+        };
+      
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+      </script>
+    <!-- Include jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <!-- Define favicon for the webpage -->
+    <link rel="icon" type="image/x-icon" href="/assets/minecraft.ico">
+</head>
+<body class="minecraft-bg">
+    <!-- Background video element (commented out) -->
+    <!--
+    <video id="video-bg" autoplay loop muted poster="assets/minecraft-sky-block-1328-x-725-wallpaper-2wpfbyq82nrf18yk.jpg">
+        <source src="assets/🌸 Minecraft Cherry Blossom Forest Ambience w_ C418 Music (Slowed) _ 4 Hours - Trim.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    -->
+
+    <!-- Main container for the registration form -->
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 offset-md-3">
+                <!-- Stylish card for registration -->
+                <div class="card-neon card-japanese-frame">
+                    <h2 class="text-white">Register</h2>
+
+                    <!-- Registration form -->
+                    <form id="registerForm" action="php/register.php" method="post">
+                        <div class="form-group">
+                            <!-- Input field for username -->
+                            <!-- <label for="username">Username:</label> -->
+                            <input type="text" class="form-control" id="username" name="username" placeholder="Username" required>
+                        </div>
+                        <div class="form-group">
+                            <!-- Input field for password -->
+                            <!-- <label for="password">Password:</label> -->
+                            <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
+                        </div>
+                        <div class="form-group">
+                            <!-- Input field for email -->
+                            <!-- <label for="email">Email:</label> -->
+                            <input type="email" class="form-control" id="email" name="email" placeholder="Email" required>
+                        </div>
+                        <div class="form-group">
+                            <!-- Input field for first name -->
+                            <!-- <label for="firstName">First Name:</label> -->
+                            <input type="text" class="form-control" id="firstName" name="firstName" placeholder="First Name" required>
+                        </div>
+                        <div class="form-group">
+                            <!-- Input field for last name -->
+                            <!-- <label for="lastName">Last Name:</label> -->
+                            <input type="text" class="form-control" id="lastName" name="lastName" placeholder="Last Name" required>
+                        </div>
+                        <div class="form-group">
+                            <!-- Input field for phone number -->
+                            <!-- <label for="phoneNumber">Phone Number:</label> -->
+                            <input type="text" class="form-control" id="phoneNumber" name="phoneNumber" placeholder="Phone Number" required>
+                        </div>
+                        <div class="form-group">
+                            <!-- Input field for age -->
+                            <input type="number" class="form-control" id="age" name="age" placeholder="Age" required>
+                        </div>
+
+                        <!-- Register button with Minecraft character image -->
+                        <button type="submit" class="btn btn-primary btn-minecraft">Register <img src="assets/Steve_(Minecraft).png" width="30px" height="30px" alt="Minecraft Character" class="img-fluid steve-float"></button>
+
+                        <!-- Link to go back to the index page -->
+                        <a href="index.html" class="btn btn-secondary btn-minecraft">Go back</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include JavaScript file for registration functionality -->
+    <script src="js/register.js"></script>
+</body>
+</html>

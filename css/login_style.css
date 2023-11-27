@@ -1,0 +1,76 @@
+/* Import the Bootstrap CSS library */
+@import "https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css";
+
+/* Background for the Minecraft theme */
+.minecraft-bg {
+    background-image: url('../assets/f74ce6007b53858d32503641f6dd88ba.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -1;
+}
+
+/* Card styling for the login form */
+.card-neon {
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(5px);
+    border-radius: 8px;
+    padding: 20px;
+    border: none;
+    color: rgb(78, 78, 78);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: transform 0.3s;
+}
+
+.card-neon:hover {
+    transform: scale(1.05); /* Enlarge the card on hover */
+}
+
+/* Minecraft style buttons */
+.btn-minecraft {
+    background-color: #7CFC00;
+    border: 3px solid #006400;
+    color: rgb(0, 0, 0);
+    padding: 10px 25px;
+    font-size: 16px;
+    box-shadow: 0 4px #006400;
+    transition: all 0.3s;
+}
+
+.btn-minecraft:hover {
+    background-color: #98FB98;
+    box-shadow: 0 6px #006400;
+    transform: translateY(-2px);
+}
+
+.btn-minecraft:active {
+    transform: translateY(2px);
+    box-shadow: 0 2px #006400;
+}
+
+/* Adjust other styles as needed */
+
+/* Video background for the login form */
+#video-bg {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    min-width: 100%;
+    min-height: 100%;
+    z-index: -1;
+}
+
+/* Japanese-style frame for the login form */
+.card-japanese-frame {
+    border: 2px solid #000000; /* Pink border */
+    border-radius: 10px; /* Rounded corners */
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* Pink shadow */
+}

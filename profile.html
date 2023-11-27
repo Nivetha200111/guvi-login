@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Profile</title>
+
+    <!-- Define favicon for the webpage -->
+    <link rel="icon" type="image/x-icon" href="/assets/minecraft.ico">
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-analytics.js";
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+      
+        // Your web app's Firebase configuration
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        const firebaseConfig = {
+          apiKey: "AIzaSyAJzV6Xi0k_L76JpprIBi6O_pEsH101EIM",
+          authDomain: "guviround2.firebaseapp.com",
+          projectId: "guviround2",
+          storageBucket: "guviround2.appspot.com",
+          messagingSenderId: "377242567229",
+          appId: "1:377242567229:web:7f4c108965c85f7c51a054",
+          measurementId: "G-R68KNY77EP"
+        };
+      
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+      </script>
+    <!-- Include CSS stylesheet for styling -->
+    <link href="css/profile_style.css" rel="stylesheet" type="text/css">
+
+    <!-- Include jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body class="minecraft-bg">
+    <!-- Container for user profile information -->
+    <div id="profileContainer">
+        <!-- Page title -->
+        <h1>User Profile</h1>
+
+        <!-- Container for user information loaded by JavaScript -->
+        <div id="userInfo">
+            <!-- User info loaded by JS -->
+        </div>
+
+        <!-- Container for user data loaded by JavaScript -->
+        <div id="userDataContainer">
+            <!-- User data loaded by JS -->
+        </div>
+
+        <!-- Button to edit the user's profile -->
+        <button id="editProfileButton">Edit Profile</button>
+
+        <!-- Form to edit the user's profile (initially hidden) -->
+        <div id="editProfileForm" style="display:none;">
+            <input type="text" id="editFirstName" placeholder="First Name">
+            <input type="text" id="editLastName" placeholder="Last Name">
+            <input type="email" id="editEmail" placeholder="Email">
+            <input type="text" id="editPhoneNumber" placeholder="Phone Number">
+            <input type="number" id="editAge" placeholder="Age">
+            <button id="saveProfileButton">Save Changes</button>
+        </div>
+
+        <!-- Link to logout -->
+        <a href="#" id="logoutLink">Logout</a>
+
+        <!-- Commented out link to logout -->
+        <!-- <a href="#" id="logoutLink">Logout</a> -->
+    </div>
+
+    <!-- Include JavaScript file for profile functionality -->
+    <script src="js/profile.js"></script>
+</body>
+</html>

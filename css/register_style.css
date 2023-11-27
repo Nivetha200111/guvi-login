@@ -1,0 +1,101 @@
+/* Import the Bootstrap CSS library */
+@import "https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css";
+
+/* Background for the Minecraft theme */
+.minecraft-bg {
+    /* Background image */
+    background-image: url('../assets/4248dc2842854731abc80bee7ecb1346.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -1; /* Place behind other elements */
+}
+
+/* Card styling for the form */
+.card-neon {
+    background: rgba(0, 0, 0, 0.6); /* Semi-transparent black background */
+    backdrop-filter: blur(5px); /* Apply a blur effect */
+    border-radius: 8px;
+    padding: 40px;
+    border: none;
+    color: rgb(79, 76, 76); /* Text color for better visibility */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: transform 0.3s; /* Add a transform animation */
+    margin-top: 100px; /* Vertically align the form */
+}
+
+.card-neon:hover {
+    transform: scale(1.05); /* Enlarge the card on hover */
+}
+
+/* Minecraft style buttons */
+.btn-minecraft {
+    background-color: #7CFC00; /* Bright green background */
+    border: none;
+    color: black;
+    padding: 10px 25px;
+    font-size: 16px;
+    box-shadow: 0 4px #4B5320; /* Shadow effect */
+    transition: all 0.3s;
+    width: 100%; /* Full width buttons */
+    margin-bottom: 15px; /* Spacing between buttons */
+}
+
+.btn-minecraft:hover {
+    background-color: #98FB98; /* Light green on hover */
+    box-shadow: 0 6px #4B5320;
+    transform: translateY(-2px);
+}
+
+.btn-minecraft:active {
+    transform: translateY(2px);
+    box-shadow: 0 2px #4B5320;
+}
+
+/* Keyframes for floating animation */
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+/* Animation for Minecraft character floating */
+.steve-float {
+    animation: float 2s ease-in-out infinite;
+}
+
+/* Form input styling for consistency with Bootstrap */
+.form-group label {
+    text-align: left;
+    display: block;
+    color: #fff; /* White label text color */
+}
+
+.form-control {
+    background: rgba(255, 255, 255, 0.1); /* Semi-transparent white background */
+    border: 2px solid rgba(255, 255, 255, 0.3); /* Semi-transparent white border */
+    border-radius: 4px;
+    color: white; /* White text color */
+    padding: 10px;
+    margin-bottom: 20px; /* Spacing between input fields */
+}
+
+/* Adjusting form input focus color */
+.form-control:focus {
+    border-color: #FF69B4; /* Pink border color on focus */
+    box-shadow: 0 0 8px rgba(255, 105, 180, 0.8); /* Pink box shadow on focus */
+}
+
+/* Additional styles can be added here */
+.card-japanese-frame {
+    border: 2px solid #000000; /* Pink border */
+    border-radius: 10px; /* Rounded corners */
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* Pink shadow effect */
+}

@@ -1,0 +1,66 @@
+/* Import the Bootstrap CSS library */
+@import "https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css";
+
+/* Minecraft Style Buttons */
+.btn-minecraft {
+    background-color: #7CFC00; /* Minecraft 'grass block' green */
+    border: 3px solid #006400; /* Dark green border for 'grass block' effect */
+    color: rgb(15, 55, 0);
+    padding: 10px 25px;
+    font-family: 'Press Start 2P', cursive; /* Pixelated font style */
+    font-size: 16px;
+    text-transform: uppercase;
+    box-shadow: 0 4px #006400;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-minecraft:hover {
+    background-color: #98FB98; /* Lighter green for hover effect */
+    box-shadow: 0 6px #006400;
+    transform: translateY(-2px);
+}
+
+.btn-minecraft:active {
+    transform: translateY(2px);
+    box-shadow: 0 2px #006400;
+}
+
+/* Minecraft Style Card */
+.card-minecraft {
+    background-color: #8B4513; /* Minecraft 'dirt block' brown */
+    border: 1px solid #654321; /* Dark brown border for 'dirt block' effect */
+    padding: 20px;
+    box-shadow: 0 4px #654321;
+    margin-top: 20px;
+    width: 300px;
+    border-radius: 4px;
+    color: rgb(31, 0, 0);
+    transition: transform 0.2s; /* Smooth transition for hover effect */
+}
+
+.card-minecraft:hover {
+    transform: scale(1.05); /* Slightly enlarge the card on hover */
+}
+
+/* Page Background */
+body {
+    background-image: url('../assets/VtvqE.jpg');
+    background-size: cover; /* This will make the background cover the entire container */
+    background-repeat: no-repeat;
+}
+
+/* Animation for floating elements */
+.animated-float {
+    animation: float 4s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+}
+
+/* Animation for Steve character floating */
+.steve-float {
+    animation: float 1s ease-in-out infinite;
+}
